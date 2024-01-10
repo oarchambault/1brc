@@ -5,21 +5,21 @@ using System.IO;
 
 namespace _1brc;
 
-internal static class MeasurementsGenerator
+internal class MeasurementsGenerator
 {
-    private sealed record WeatherStation(string Name, double MeanTemperature)
+    private readonly record struct WeatherStation(string Name, double MeanTemperature)
     {
         public string ToRandomRow() => $"{Name};{RandomTemperature:F1}";
 
         public double RandomTemperature => MeanTemperature + Random.Shared.NextDouble() * 10.0;
     }
 
-    public static void Generate(uint size)
+    public void Generate(uint size, string measurementsFile)
     {
         var sw = Stopwatch.StartNew();
         Console.WriteLine($"Generating {size} measurements...");
 
-        using var fileWriter = new StreamWriter("measurements.txt", false);
+        using var fileWriter = new StreamWriter(measurementsFile, false);
 
         for (int i = 0; i < size; i++)
         {
@@ -31,12 +31,12 @@ internal static class MeasurementsGenerator
             fileWriter.WriteLine(GetRandomStation().ToRandomRow());
         }
 
-        Console.WriteLine($"Done generating {size} measurements in {sw.Elapsed}.");
+        Console.WriteLine($"Done generating {size} measurements in {sw.Elapsed}, file: {measurementsFile}.");
     }
 
-    private static WeatherStation GetRandomStation() => Stations[Random.Shared.Next(Stations.Count)];
+    private WeatherStation GetRandomStation() => Stations[Random.Shared.Next(Stations.Count)];
 
-    private static readonly List<WeatherStation> Stations = new List<WeatherStation>()
+    private readonly List<WeatherStation> Stations = new List<WeatherStation>()
     {
         new WeatherStation("Abha", 18.0),
         new WeatherStation("Abidjan", 26.0),
